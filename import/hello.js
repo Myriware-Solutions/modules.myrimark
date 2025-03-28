@@ -1,12 +1,11 @@
-export const HelloModule = {
-    'local': {
-        'hello_world': (rb, name="") => {
-            const p = document.createElement('p');
-            p.innerText = "Hello World" + ((name)?", ":"") + name;
-            return p;
-        }
-    },
-    'global': {
-        'Alert': (_) => { alert("Hello World"); }
+export const LocalCommands = {
+    'world': (rb, name="") => {
+        const p = document.createElement('p');
+        p.innerText = "Hello World" + ((name)?", ":"") + name;
+        return p;
     }
-};
+}
+
+export const GlobalCommands = {
+    'Alert': (_) => { alert("Hello World"); }
+}
