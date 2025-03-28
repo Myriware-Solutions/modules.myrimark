@@ -434,7 +434,7 @@ export class Myrimark {
             let url = "";
             if (this.#global_commands.includes('LocalDebug'))
                 url = `/import/import.php?name=${moduleName}`;
-            else url = `TODO${moduleName}`;
+            else url = `https://api.myriware.space/myrimark/mod/${moduleName}`;
             const mod = await this.#loadModuleFromURL(url);
             // Add commands
             for (const [name, local_command] of Object.entries(mod.LocalCommands)) {
