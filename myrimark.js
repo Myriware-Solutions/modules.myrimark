@@ -688,6 +688,24 @@ export class Myrimark {
      * 
      * @param {string} string 
      * @param {RegExp} regexReference
+     * @param {RegexSearchCallback} callback 
+     */
+    static RegexSearch(string, regexReference, callback) {
+        const regex = structuredClone(regexReference);
+        let m;
+        while ((m = regex.exec(string)) !== null) {
+            if (m.index === regex.lastIndex) regex.lastIndex++;
+            let groups = [];
+            m.forEach((match) => { groups.push(match); });
+            callback(groups);
+        }
+        return true;
+    }
+
+    /**
+     * 
+     * @param {string} string 
+     * @param {RegExp} regexReference
      * @param {AsyncRegexSearchCallback} callback 
      */
     async #asyncRegexSearch(string, regexReference, callback) {
@@ -709,6 +727,26 @@ export class Myrimark {
      * @returns {string[]}
      */
     #regexMatchContents(string, regexReference) {
+        const regex = structuredClone(regexReference);
+        let m, matches = [];
+        while ((m = regex.exec(string)) !== null) {
+            if (m.index === regex.lastIndex) regex.lastIndex++;
+            let groups = [];
+            m.forEach((match, groupIndex) => { if(groupIndex!==0) groups.push(match); });
+            if (groups.length === 1)
+                matches.push(groups[0])
+            else matches.push(groups);
+        }
+        return matches;
+    }
+
+    /**
+     * 
+     * @param {string} string 
+     * @param {RegExp} regexReference 
+     * @returns {string[]}
+     */
+    static RegexMatchContents(string, regexReference) {
         const regex = structuredClone(regexReference);
         let m, matches = [];
         while ((m = regex.exec(string)) !== null) {
