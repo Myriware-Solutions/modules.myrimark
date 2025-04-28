@@ -138,6 +138,7 @@ export class Myrimark {
         'header': /^(#+) *(.*)/mg,
         'globalcommand': /^\\([\w.]+)/gm,
         'block_comments': /(?<!\\)%\[.*(?<!\\)\]%/gm,
+        'metadata_comments': /%@\[([\w=]+)\]@%/gm,
         'singleline_comments': / *(?<!\\)%%.*$/gm,
         'strings': /(?<={)"([\w\W]*?)"(?=})/gm
     }
@@ -853,6 +854,11 @@ export class Myrimark {
      */
     #formatLine(line) {
         let fline = line+'';
+        //metadata (Primaraly used for Myridox Editors)
+        Myrimark.RegexSearch(fline,this.#Regexes.metadata_comments, (gs) => {
+            fline = fline.replaceAll(gs[0], `<span hidden>${gs[1]}</span>`)
+        });
+        fline = fline.replaceAll('%@:CURSOR:@%', '<span class="blinking-cursor">|</span>');
         //command-type styles
         for (const [type, regex] of Object.entries(this.#Regexes.cmd_line)) {
             this.regexSearch(fline, regex, (g) => {
