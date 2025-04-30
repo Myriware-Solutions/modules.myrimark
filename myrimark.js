@@ -501,7 +501,6 @@ export class Myrimark {
                 container.appendChild(image);
                 container.appendChild(errorText);
             } else {
-                console.log("Using Cached Image");
                 container.appendChild(this.Cache.images[url].cloneNode());
             }
             return container;
