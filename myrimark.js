@@ -17,6 +17,11 @@ export class Myrimark {
     /** @type {Object.<string, string[]>} User bin for storing info for the REPEAT local command */
     #objectStash={}
 
+    Cache={
+        /** @type {Object.<string,HTMLImageElement>} */
+        images: {}
+    };
+
     /**
      * The Constructor for an object that is used to parse Myrimark.
      * @param {Document} doc For cross-compatablity purposes, 
@@ -28,6 +33,13 @@ export class Myrimark {
             this.#document = doc;
         // eslint-disable-next-line
         else this.#document = document;
+        if (!globalThis.MyriwareCache) {
+            globalThis.MyriwareCache = {
+                /** @type {Object.<string,HTMLImageElement>} */
+                images: {}
+            };
+        }
+        this.Cache = globalThis.MyriwareCache;
     }
 
     /**
@@ -458,34 +470,40 @@ export class Myrimark {
         'image': (rb, url, scale = 1) => {
             if (typeof scale === 'string') scale = parseFloat(scale);
             const container = this.#document.createElement('div');
+            container.classList.add("myrimark-img-container");
 
-            const image = this.#document.createElement('img');
-            image.src = url;
-            image.style.display = 'none'; // Hide initially
-
-            const errorText = this.#document.createElement('span');
-            errorText.textContent = 'Error: Unable to load image: ' + url;
-            errorText.style.color = 'red';
-            errorText.style.display = 'none';
-
-            image.onload = () => {
-                let width = image.width * scale;
-                let height = image.height * scale;
-                image.width = width;
-                image.height = height;
-                image.style.display = 'block'; // Show the image
-                errorText.style.display = 'none'; // Hide error text
-            };
-
-            image.onerror = () => {
-                image.style.display = 'none'; // Hide image
-                if (!this.#global_commands.includes('HideImageErrors'))
-                    errorText.style.display = 'block'; // Show error text
-            };
-
-            container.appendChild(image);
-            container.appendChild(errorText);
-            
+            if (!Object.keys(this.Cache.images).includes(url)) {
+                const image = this.#document.createElement('img');
+                image.src = url;
+                this.Cache.images[url] = image.cloneNode();
+                image.style.display = 'none'; // Hide initially
+    
+                const errorText = this.#document.createElement('span');
+                errorText.textContent = 'Error: Unable to load image: ' + url;
+                errorText.style.color = 'red';
+                errorText.style.display = 'none';
+    
+                image.onload = () => {
+                    // let width = image.width * scale;
+                    // let height = image.height * scale;
+                    // image.width = width;
+                    // image.height = height;
+                    image.style.display = 'block'; // Show the image
+                    errorText.style.display = 'none'; // Hide error text
+                };
+    
+                image.onerror = () => {
+                    image.style.display = 'none'; // Hide image
+                    if (!this.#global_commands.includes('HideImageErrors'))
+                        errorText.style.display = 'block'; // Show error text
+                };
+                
+                container.appendChild(image);
+                container.appendChild(errorText);
+            } else {
+                console.log("Using Cached Image");
+                container.appendChild(this.Cache.images[url].cloneNode());
+            }
             return container;
         },
         /**
